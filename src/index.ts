@@ -18,10 +18,12 @@ type Copilot = {
   }>;
 };
 
+const sourceName = 'copilot';
+
 export const activate = async (context: ExtensionContext): Promise<void> => {
   context.subscriptions.push(
     sources.createSource({
-      name: 'copilot source',
+      name: sourceName,
       doComplete: async (option) => {
         const result = await getCompletionItems(option);
         return result;
@@ -30,7 +32,7 @@ export const activate = async (context: ExtensionContext): Promise<void> => {
   );
 
   events.on('CompleteDone', async (item: VimCompleteItem) => {
-    if (item.menu !== '[Copilot]') {
+    if (item.source !== sourceName) {
       return;
     }
 
@@ -54,6 +56,7 @@ export const activate = async (context: ExtensionContext): Promise<void> => {
 const getCompletionItems = async (option: CompleteOption): Promise<CompleteResult> => {
   const buffer = workspace.nvim.createBuffer(option.bufnr);
   const copilot = (await buffer.getVar('_copilot')) as Copilot | null;
+  const filetype = (await workspace.nvim.call('getbufvar', ['', '&filetype'])) as string;
 
   if (copilot?.suggestions == null) {
     return {
@@ -79,9 +82,10 @@ const getCompletionItems = async (option: CompleteOption): Promise<CompleteResul
       return {
         word: text.split('\n')[0].slice(option.col),
         info,
-        menu: '[Copilot]',
         user_data: text,
         dup: 1,
+        empty: 1,
+        documentation: [{ filetype, content: info }],
       };
     }),
   };
