@@ -88,5 +88,6 @@ const getCompletionItems = async (option: CompleteOption): Promise<CompleteResul
         documentation: [{ filetype, content: info }],
       };
     }),
+    priority: 1000,
   };
 };
