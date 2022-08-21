@@ -25,6 +25,7 @@ export const activate = async (context: ExtensionContext): Promise<void> => {
     sources.createSource({
       name: sourceName,
       shortcut: 'copilot',
+      triggerCharacters: ['.', ' '],
       doComplete: async (option) => {
         const result = await getCompletionItems(option);
         return result;
@@ -80,7 +81,7 @@ const getCompletionItems = async (option: CompleteOption): Promise<CompleteResul
       }
 
       return {
-        kind: ' ',
+        kind: '\uF113\xA0',
         word: text.split('\n')[0].slice(option.col),
         info,
         user_data: text,
