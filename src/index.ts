@@ -24,6 +24,7 @@ export const activate = async (context: ExtensionContext): Promise<void> => {
   context.subscriptions.push(
     sources.createSource({
       name: sourceName,
+      shortcut: 'copilot',
       doComplete: async (option) => {
         const result = await getCompletionItems(option);
         return result;
