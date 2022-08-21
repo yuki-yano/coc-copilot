@@ -48,7 +48,6 @@ export const activate = async (context: ExtensionContext): Promise<void> => {
       const appendLines = lines.slice(1);
       await workspace.nvim.call('append', [lnum, appendLines]);
       await workspace.nvim.call('setpos', ['.', [0, lnum + appendLines.length, appendLines.slice(-1)[0].length + 1]]);
-      await workspace.nvim.command('redraw!');
     }
   });
 };
@@ -80,6 +79,7 @@ const getCompletionItems = async (option: CompleteOption): Promise<CompleteResul
       }
 
       return {
+        kind: ' ',
         word: text.split('\n')[0].slice(option.col),
         info,
         user_data: text,
