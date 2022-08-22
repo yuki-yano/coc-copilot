@@ -21,13 +21,22 @@ type Copilot = {
 const sourceName = 'copilot';
 
 export const activate = async (context: ExtensionContext): Promise<void> => {
+  const extensionConfig = workspace.getConfiguration(sourceName);
+  const isEnable = extensionConfig.get('copilot.enable', true);
+  const kindLabel = extensionConfig.get('kindLabel', ' ');
+  const priority = extensionConfig.get('copilot.priority', 1000);
+
+  if (!isEnable) {
+    return;
+  }
+
   context.subscriptions.push(
     sources.createSource({
       name: sourceName,
       shortcut: 'copilot',
       triggerCharacters: ['.', ' '],
       doComplete: async (option) => {
-        const result = await getCompletionItems(option);
+        const result = await getCompletionItems(option, kindLabel, priority);
         return result;
       },
     })
@@ -54,7 +63,11 @@ export const activate = async (context: ExtensionContext): Promise<void> => {
   });
 };
 
-const getCompletionItems = async (option: CompleteOption): Promise<CompleteResult> => {
+const getCompletionItems = async (
+  option: CompleteOption,
+  kindLabel: string,
+  priority: number
+): Promise<CompleteResult> => {
   const buffer = workspace.nvim.createBuffer(option.bufnr);
   const copilot = (await buffer.getVar('_copilot')) as Copilot | null;
   const filetype = (await workspace.nvim.call('getbufvar', ['', '&filetype'])) as string;
@@ -81,7 +94,7 @@ const getCompletionItems = async (option: CompleteOption): Promise<CompleteResul
       }
 
       return {
-        kind: '\uF113\xA0',
+        kind: kindLabel,
         word: text.split('\n')[0].slice(option.col),
         info,
         user_data: text,
@@ -90,6 +103,6 @@ const getCompletionItems = async (option: CompleteOption): Promise<CompleteResul
         documentation: [{ filetype, content: info }],
       };
     }),
-    priority: 1000,
+    priority,
   };
 };

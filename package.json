@@ -38,5 +38,25 @@
   "activationEvents": [
     "*"
   ],
-  "contributes": {}
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "copilot.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable coc-copilot extension"
+        },
+        "copilot.kindLabel": {
+          "type": "string",
+          "default": " ",
+          "description": "Copilot kind label"
+        },
+        "copilot.priority": {
+          "type": "integer",
+          "default": 1000
+        }
+      }
+    }
+  }
 }
